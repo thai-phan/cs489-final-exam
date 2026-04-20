@@ -1,11 +1,15 @@
 package org.cs489.finalexam.service;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.cs489.finalexam.dto.LeaseCreateRequestDto;
 import org.cs489.finalexam.dto.LeaseApartmentResponseDto;
 import org.cs489.finalexam.dto.LeaseResponseDto;
 import org.cs489.finalexam.dto.LeaseTenantResponseDto;
+import org.cs489.finalexam.dto.TotalLeaseRevenueResponseDto;
 import org.cs489.finalexam.entity.Apartment;
 import org.cs489.finalexam.entity.Lease;
 import org.cs489.finalexam.entity.Tenant;
@@ -37,6 +41,20 @@ public class LeaseService {
                 .stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    public TotalLeaseRevenueResponseDto getTotalLeaseRevenueByState(String state) {
+        if (!StringUtils.hasText(state)) {
+            throw new IllegalArgumentException("State is required");
+        }
+
+        String normalizedState = state.trim();
+        BigDecimal totalRevenue = leaseRepository.findAllByState(normalizedState)
+                .stream()
+                .map(this::calculateLeaseRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new TotalLeaseRevenueResponseDto(normalizedState.toUpperCase(), totalRevenue);
     }
 
     public LeaseResponseDto registerLease(Integer apartmentId, Integer tenantId, LeaseCreateRequestDto request) {
@@ -107,6 +125,19 @@ public class LeaseService {
                         tenant.getEmail()
                 )
         );
+    }
+
+    private BigDecimal calculateLeaseRevenue(Lease lease) {
+        long leaseMonths = ChronoUnit.MONTHS.between(
+                YearMonth.from(lease.getStartDate()),
+                YearMonth.from(lease.getEndDate())
+        ) + 1;
+
+        if (leaseMonths <= 0) {
+            throw new IllegalArgumentException("Lease end date must be on or after start date");
+        }
+
+        return lease.getMonthlyRentalRate().multiply(BigDecimal.valueOf(leaseMonths));
     }
 }
 

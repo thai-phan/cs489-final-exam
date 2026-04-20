@@ -12,6 +12,7 @@ import org.cs489.finalexam.dto.LeaseCreateRequestDto;
 import org.cs489.finalexam.dto.LeaseApartmentResponseDto;
 import org.cs489.finalexam.dto.LeaseResponseDto;
 import org.cs489.finalexam.dto.LeaseTenantResponseDto;
+import org.cs489.finalexam.dto.TotalLeaseRevenueResponseDto;
 import org.cs489.finalexam.service.LeaseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -84,6 +85,20 @@ class LeaseControllerTest {
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Apartment not found: 999", response.getBody());
+    }
+
+    @Test
+    void shouldReturnTotalRevenueByState() {
+        LeaseService leaseService = mock(LeaseService.class);
+        LeaseController leaseController = new LeaseController(leaseService);
+
+        when(leaseService.getTotalLeaseRevenueByState("IL"))
+                .thenReturn(new TotalLeaseRevenueResponseDto("IL", new BigDecimal("6750.00")));
+
+        TotalLeaseRevenueResponseDto response = leaseController.getTotalLeaseRevenueByState("IL");
+
+        assertEquals("IL", response.state());
+        assertEquals(new BigDecimal("6750.00"), response.totalRevenue());
     }
 }
 

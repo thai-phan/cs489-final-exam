@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import org.cs489.finalexam.dto.LeaseCreateRequestDto;
 import org.cs489.finalexam.dto.LeaseResponseDto;
+import org.cs489.finalexam.dto.TotalLeaseRevenueResponseDto;
 import org.cs489.finalexam.entity.Address;
 import org.cs489.finalexam.entity.Apartment;
 import org.cs489.finalexam.entity.Lease;
@@ -136,6 +137,46 @@ class LeaseServiceTest {
         );
 
         assertEquals("End date must be on or after start date", exception.getMessage());
+    }
+
+    @Test
+    void shouldCalculateTotalRevenueByState() {
+        LeaseRepository leaseRepository = mock(LeaseRepository.class);
+        ApartmentRepository apartmentRepository = mock(ApartmentRepository.class);
+        TenantRepository tenantRepository = mock(TenantRepository.class);
+        LeaseService leaseService = new LeaseService(leaseRepository, apartmentRepository, tenantRepository);
+
+        Lease firstLease = new Lease();
+        firstLease.setStartDate(LocalDate.of(2026, 1, 1));
+        firstLease.setEndDate(LocalDate.of(2026, 3, 31));
+        firstLease.setMonthlyRentalRate(new BigDecimal("1000.00"));
+
+        Lease secondLease = new Lease();
+        secondLease.setStartDate(LocalDate.of(2026, 2, 10));
+        secondLease.setEndDate(LocalDate.of(2026, 4, 1));
+        secondLease.setMonthlyRentalRate(new BigDecimal("1250.00"));
+
+        when(leaseRepository.findAllByState("IL")).thenReturn(List.of(firstLease, secondLease));
+
+        TotalLeaseRevenueResponseDto revenue = leaseService.getTotalLeaseRevenueByState("IL");
+
+        assertEquals("IL", revenue.state());
+        assertEquals(new BigDecimal("6750.00"), revenue.totalRevenue());
+    }
+
+    @Test
+    void shouldRejectBlankStateWhenCalculatingRevenue() {
+        LeaseRepository leaseRepository = mock(LeaseRepository.class);
+        ApartmentRepository apartmentRepository = mock(ApartmentRepository.class);
+        TenantRepository tenantRepository = mock(TenantRepository.class);
+        LeaseService leaseService = new LeaseService(leaseRepository, apartmentRepository, tenantRepository);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> leaseService.getTotalLeaseRevenueByState(" ")
+        );
+
+        assertEquals("State is required", exception.getMessage());
     }
 }
 

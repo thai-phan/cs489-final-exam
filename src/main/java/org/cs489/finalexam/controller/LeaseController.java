@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.cs489.finalexam.dto.LeaseCreateRequestDto;
 import org.cs489.finalexam.dto.LeaseResponseDto;
+import org.cs489.finalexam.dto.TotalLeaseRevenueResponseDto;
 import org.cs489.finalexam.service.LeaseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,6 +30,11 @@ public class LeaseController {
     @GetMapping("/leases")
     public List<LeaseResponseDto> getAllLeases() {
         return leaseService.getAllLeases();
+    }
+
+    @GetMapping("/leases/revenue")
+    public TotalLeaseRevenueResponseDto getTotalLeaseRevenueByState(@RequestParam String state) {
+        return leaseService.getTotalLeaseRevenueByState(state);
     }
 
     @PostMapping("/apartments/{apartmentId}/tenants/{tenantId}/leases")

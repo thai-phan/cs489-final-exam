@@ -4,6 +4,7 @@ import java.util.List;
 import org.cs489.finalexam.entity.Lease;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface LeaseRepository extends JpaRepository<Lease, Integer> {
 
@@ -17,5 +18,14 @@ public interface LeaseRepository extends JpaRepository<Lease, Integer> {
     List<Lease> findAllWithApartmentAndTenantOrderByLeaseNumberAsc();
 
     boolean existsByLeaseNumberIgnoreCase(String leaseNumber);
+
+    @Query("""
+            SELECT l
+            FROM Lease l
+            JOIN l.apartment a
+            JOIN a.address ad
+            WHERE LOWER(ad.state) = LOWER(:state)
+            """)
+    List<Lease> findAllByState(@Param("state") String state);
 }
 
