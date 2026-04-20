@@ -1,8 +1,10 @@
 package org.cs489.finalexam.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.cs489.finalexam.dto.LeaseCreateRequestDto;
+import org.cs489.finalexam.dto.LeaseCreateRequestRequest;
 import org.cs489.finalexam.dto.LeaseResponseDto;
 import org.cs489.finalexam.dto.TotalLeaseRevenueResponseDto;
 import org.cs489.finalexam.service.LeaseService;
@@ -41,9 +43,11 @@ public class LeaseController {
     public ResponseEntity<LeaseResponseDto> registerLease(
             @PathVariable Integer apartmentId,
             @PathVariable Integer tenantId,
-            @RequestBody LeaseCreateRequestDto request
+            @RequestBody LeaseCreateRequestRequest request
     ) {
-        LeaseResponseDto createdLease = leaseService.registerLease(apartmentId, tenantId, request);
+        LeaseCreateRequestDto data = new LeaseCreateRequestDto(request.leaseNumber(), LocalDate.parse(request.startDate()), LocalDate.parse(request.endDate()), request.monthlyRentalRate());
+
+        LeaseResponseDto createdLease = leaseService.registerLease(apartmentId, tenantId, data);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLease);
     }
 
