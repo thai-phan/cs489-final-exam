@@ -10,39 +10,35 @@ import org.junit.jupiter.api.Test;
 class EntityModelTest {
 
     @Test
-    void shouldBuildEntitiesWithLombokBuilder() {
-        Address address = Address.builder()
-                .apartmentNumber("W1100")
-                .street("40 W Burlington Avenue")
-                .city("Chicago")
-                .state("IL")
-                .zipCode("66543")
-                .build();
+    void shouldBuildEntitiesAndRelationships() {
+        Address address = new Address();
+        address.setApartmentNumber("W1100");
+        address.setStreet("40 W Burlington Avenue");
+        address.setCity("Chicago");
+        address.setState("IL");
+        address.setZipCode("66543");
 
-        Apartment apartment = Apartment.builder()
-                .apartmentNumber("W1100")
-                .propertyName("Bells Court")
-                .floorNo(14)
-                .size(1050)
-                .numberOfRooms(2)
-                .address(address)
-                .build();
+        Apartment apartment = new Apartment();
+        apartment.setApartmentNumber("W1100");
+        apartment.setPropertyName("Bells Court");
+        apartment.setFloorNo(14);
+        apartment.setSize(1050);
+        apartment.setNumberOfRooms(2);
+        apartment.setAddress(address);
 
-        Tenant tenant = Tenant.builder()
-                .firstName("Ben")
-                .lastName("Klein")
-                .phoneNumber("(480) 123-1355")
-                .email("ben@example.com")
-                .build();
+        Tenant tenant = new Tenant();
+        tenant.setFirstName("Ben");
+        tenant.setLastName("Klein");
+        tenant.setPhoneNumber("(480) 123-1355");
+        tenant.setEmail("ben@example.com");
 
-        Lease lease = Lease.builder()
-                .leaseNumber("D0187-18775")
-                .startDate(LocalDate.of(2021, 10, 1))
-                .endDate(LocalDate.of(2022, 9, 30))
-                .monthlyRentalRate(new BigDecimal("2750.00"))
-                .apartment(apartment)
-                .tenant(tenant)
-                .build();
+        Lease lease = new Lease();
+        lease.setLeaseNumber("D0187-18775");
+        lease.setStartDate(LocalDate.of(2021, 10, 1));
+        lease.setEndDate(LocalDate.of(2022, 9, 30));
+        lease.setMonthlyRentalRate(new BigDecimal("2750.00"));
+        lease.setApartment(apartment);
+        lease.setTenant(tenant);
 
         apartment.getLeases().add(lease);
         tenant.getLeases().add(lease);

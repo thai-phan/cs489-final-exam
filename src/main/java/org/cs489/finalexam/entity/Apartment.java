@@ -14,12 +14,9 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "apartments")
@@ -27,14 +24,10 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString(exclude = {"address", "leases"})
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Apartment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Integer apartmentId;
 
     @Column(nullable = false, length = 20, unique = true)
@@ -55,7 +48,6 @@ public class Apartment {
     @JoinColumn(name = "address_id", nullable = false, unique = true)
     private Address address;
 
-    @Builder.Default
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lease> leases = new ArrayList<>();
 }
